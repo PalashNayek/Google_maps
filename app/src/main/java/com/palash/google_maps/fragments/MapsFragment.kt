@@ -1,9 +1,8 @@
-package com.palash.google_maps.google_maps
+package com.palash.google_maps.fragments
 
 import android.Manifest
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
 import androidx.fragment.app.Fragment
@@ -14,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.registerReceiver
 import androidx.lifecycle.Observer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -25,10 +23,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
 import com.palash.google_maps.R
 import com.palash.google_maps.broadcast.LocationProviderReceiver
 import com.palash.google_maps.databinding.FragmentMapsBinding
+import com.palash.google_maps.utils.Constants.LOCATION_REQUEST_CODE
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -44,11 +42,6 @@ class MapsFragment : Fragment() {
     private lateinit var mMap: GoogleMap
     private val locationProviderReceiver = LocationProviderReceiver()
 
-    companion object {
-        private const val LOCATION_REQUEST_CODE = 1
-    }
-
-
     private val callback = OnMapReadyCallback { googleMap ->
         mMap = googleMap
         //mMap.uiSettings.isZoomControlsEnabled = true
@@ -63,16 +56,17 @@ class MapsFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context!!)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         activity?.registerReceiver(
             locationProviderReceiver,
             IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
@@ -92,12 +86,12 @@ class MapsFragment : Fragment() {
 
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(
-                context!!,
+                requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
             &&
             ActivityCompat.checkSelfPermission(
-                context!!,
+                requireContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -107,7 +101,7 @@ class MapsFragment : Fragment() {
                 LOCATION_REQUEST_CODE
             )
             mapFragment?.getMapAsync(callback)
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(context!!)
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
             return
         }
 

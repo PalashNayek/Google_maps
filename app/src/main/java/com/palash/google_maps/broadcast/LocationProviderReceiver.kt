@@ -9,15 +9,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 class LocationProviderReceiver : BroadcastReceiver() {
+
     private var _islocationData = MutableLiveData<String>()
     val isLocationData: LiveData<String> get() = _islocationData
+
     override fun onReceive(context: Context?, intent: Intent?) {
         if (intent?.action == LocationManager.PROVIDERS_CHANGED_ACTION) {
             // Location provider setting has changed
-            val locationManager =
-                context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            val isLocationEnabled =
-                locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            val locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val isLocationEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
             if (isLocationEnabled) {
                 // Location is enabled
